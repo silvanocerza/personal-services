@@ -1,0 +1,31 @@
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID?error}
+      - PGID=${PGID?error}
+      - UMASK=${UMASK?error}
+      - TZ=${TIMEZONE:-Etc/UTC}
+      - WEBUI_PORT=8081
+      - TORRENTING_PORT=6881
+    volumes:
+      - ${COMMON_STORAGE?error}/config/qbittorrent:/config
+      - ${COMMON_STORAGE?error}/data:/data
+    ports:
+      - 8081:8081
+      - 6881:6881
+      - 6881:6881/udp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${MAIN_ENDPOINT?error}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=web"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8081"
+      - "traefik.docker.network=traefik-net"
+    restart: unless-stopped
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true

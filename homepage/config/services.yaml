@@ -1,0 +1,21 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services
+- Services:
+    - Traefik:
+        widget:
+            type: traefik
+            url: http://traefik:8080
+    - Sonarr:
+        widget:
+            type: sonarr
+            url: "http://sonarr.{{HOMEPAGE_VAR_MAIN_ENDPOINT}}"
+            key: "{{HOMEPAGE_VAR_SONARR_API_KEY}}"
+            enableQueue: true
+    - Radarr:
+        widget:
+            type: radarr
+            url: "http://radarr.{{HOMEPAGE_VAR_MAIN_ENDPOINT}}"
+            key: "{{HOMEPAGE_VAR_RADARR_API_KEY}}"
+            enableQueue: true
+

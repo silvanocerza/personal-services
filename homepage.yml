@@ -1,0 +1,31 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      - PUID=${PUID?error}
+      - PGID=${PGID?error}
+      - UMASK=${UMASK?error}
+      - TZ=${TIMEZONE:-Etc/UTC}
+      - HOMEPAGE_VAR_MAIN_ENDPOINT=${MAIN_ENDPOINT:?}
+      - HOMEPAGE_VAR_SONARR_API_KEY=${SONARR_API_KEY:?}
+      - HOMEPAGE_VAR_RADARR_API_KEY=${RADARR_API_KEY:?}
+      - HOMEPAGE_VAR_WATCHTOWER_API_TOKEN=${WATCHTOWER_API_TOKEN:?}
+    ports:
+      - 3000:3000
+    volumes:
+      - ./homepage/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`${MAIN_ENDPOINT?error}`)"
+      - "traefik.http.routers.homepage.entrypoints=web"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik-net"
+    restart: unless-stopped
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    name: traefik-net

@@ -1,0 +1,14 @@
+services:
+  watchtower:
+    image: "containrrr/watchtower"
+    container_name: "watchtower"
+    environment:
+      - TZ=${TIMEZONE:-Etc/UTC}
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_API_TOKEN?error}
+    command:
+      - "--cleanup"
+      - "--http-api-metrics"
+    ports:
+      - "8082:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
