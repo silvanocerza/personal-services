@@ -1,0 +1,33 @@
+services:
+  home-assistant:
+    image: lscr.io/linuxserver/homeassistant:latest
+    container_name: home-assistant
+    environment:
+      - PUID=${PUID?error}
+      - PGID=${PGID?error}
+      - TZ=${TIMEZONE:-Etc/UTC}
+    volumes:
+      - ${COMMON_STORAGE?error}/config/home-assistant:/config
+    restart: unless-stopped
+    privileged: true
+    network_mode: "host"
+
+  home-assistant-proxy:
+    image: nginx:alpine
+    container_name: home-assistant-proxy
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - traefik-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.home-assistant.rule=Host(`home.${MAIN_ENDPOINT?error}`)"
+      - "traefik.http.routers.home-assistant.entrypoints=web"
+      - "traefik.http.services.home-assistant.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik-net"
+
+networks:
+  traefik-net:
+    external: true
