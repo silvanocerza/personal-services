@@ -6,6 +6,7 @@ services:
       - PUID=${PUID?error}
       - PGID=${PGID?error}
       - TZ=${TIMEZONE:-Etc/UTC}
+      - "DNS_SERVER=${DNS_SERVER?error}"
     volumes:
       - ${COMMON_STORAGE?error}/config/home-assistant:/config
     restart: unless-stopped
