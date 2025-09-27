@@ -1,0 +1,28 @@
+services:
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:develop
+    container_name: lidarr
+    environment:
+      - PUID=${PUID?error}
+      - PGID=${PGID?error}
+      - UMASK=${UMASK?error}
+      - TZ=${TIMEZONE:-Etc/UTC}
+    ports:
+      - "8686:8686"
+    volumes:
+      - "${COMMON_STORAGE?error}/config/lidarr:/config"
+      - "${COMMON_STORAGE?error}/data:/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lidarr.rule=Host(`lidarr.${MAIN_ENDPOINT?error}`)"
+      - "traefik.http.routers.lidarr.entrypoints=web"
+      - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
+      - "traefik.docker.network=traefik-net"
+    restart: unless-stopped
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true
+
