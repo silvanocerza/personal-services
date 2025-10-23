@@ -1,0 +1,29 @@
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: "${PUID?error}:${PGID?error}"
+    ports:
+      - "4533:4533"
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID?error}
+      - PGID=${PGID?error}
+      - TZ=${TIMEZONE:-Etc/UTC}
+      - ND_ENABLEINSIGHTSCOLLECTOR=false
+    volumes:
+      - "${COMMON_STORAGE?error}/config/navidrome:/data"
+      - "${COMMON_STORAGE?error}/data/media/music:/music:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.navidrome.rule=Host(`navidrome.${MAIN_ENDPOINT?error}`)"
+      - "traefik.http.routers.navidrome.entrypoints=web"
+      - "traefik.http.services.navidrome.loadbalancer.server.port=4533"
+      - "traefik.docker.network=traefik-net"
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true
+
