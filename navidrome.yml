@@ -14,6 +14,7 @@ services:
     volumes:
       - "${COMMON_STORAGE?error}/config/navidrome:/data"
       - "${COMMON_STORAGE?error}/data/media/music:/music:ro"
+      - "${COMMON_STORAGE?error}/data/aurral:/aurral-downloads"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.navidrome.rule=Host(`navidrome.${MAIN_ENDPOINT?error}`)"

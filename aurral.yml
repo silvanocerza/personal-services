@@ -1,0 +1,31 @@
+services:
+    aurral:
+        image: ghcr.io/lklynet/aurral:latest
+        container_name: aurral
+        restart: unless-stopped
+        ports:
+            - "3001:3001"
+        environment:
+            - TZ=${TIMEZONE:-Etc/UTC}
+            - PUID=${PUID?error}
+            - PGID=${PGID?error}
+            # - DOWNLOAD_FOLDER=${COMMON_STORAGE?error}/downloads/aurral/tmp
+            - DOWNLOAD_FOLDER=/aurral-downloads/aurral-weekly-flow
+            - WEEKLY_FLOW_FOLDER=/aurral-downloads/aurral-weekly-flow
+            - TRUST_PROXY=loopback
+        volumes:
+            - "${COMMON_STORAGE?error}/config/aurral/data:/app/backend/data"
+            # - "${COMMON_STORAGE?error}/downloads/aurral/tmp:/app/downloads"
+            - "${COMMON_STORAGE?error}/data/aurral/tmp:/aurral-downloads/aurral-weekly-flow"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.aurral.rule=Host(`aurral.${MAIN_ENDPOINT?error}`)"
+            - "traefik.http.routers.aurral.entrypoints=web"
+            - "traefik.http.services.aurral.loadbalancer.server.port=3001"
+            - "traefik.docker.network=traefik-net"
+        networks:
+            - traefik-net
+
+networks:
+    traefik-net:
+        external: true
