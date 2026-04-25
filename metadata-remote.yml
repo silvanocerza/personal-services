@@ -1,0 +1,24 @@
+services:
+    metadata-remote:
+        image: ghcr.io/wow-signal-dev/metadata-remote:latest
+        container_name: metadata-remote
+        environment:
+            - PUID=${PUID?error}
+            - PGID=${PGID?error}
+        ports:
+            - "8338:8338"
+        volumes:
+            - "${COMMON_STORAGE?error}/data/media/music:/music"
+        restart: unless-stopped
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.metadata-remote.rule=Host(`mdrm.${MAIN_ENDPOINT?error}`)"
+            - "traefik.http.routers.metadata-remote.entrypoints=web"
+            - "traefik.http.services.metadata-remote.loadbalancer.server.port=8338"
+            - "traefik.docker.network=traefik-net"
+        networks:
+            - traefik-net
+
+networks:
+    traefik-net:
+        external: true
